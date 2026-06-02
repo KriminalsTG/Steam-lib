@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Steam Manifest Files</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1b2838 0%, #2a475e 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+        
+        header {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 25px;
+            border-radius: 12px;
+            margin-bottom: 25px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        h1 {
+            color: #ffffff;
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+        
+        .folder-info {
+            color: #66c0f4;
+            font-size: 14px;
+        }
+        
+        .search-section {
+            margin: 20px 0;
+            position: relative;
+        }
+        
+        .search-input {
+            width: 100%; 
+            padding: 14px 20px 14px 50px; 
+            border: 2px solid rgba(102, 192, 244, 0.3); 
+            border-radius: 8px; 
+            background: rgba(255,255,255,0.1); 
+            color: #ffffff; 
+            font-size: 16px;
+            backdrop-filter: blur(10px);
+        }
+        
+        .search-input:focus {
+            outline: none;
+            border-color: #66c0f4;
+            background: rgba(255,255,255,0.15);
+            box-shadow: 0 0 0 3px rgba(102, 192, 244, 0.2);
+        }
+        
+        .search-input::placeholder {
+            color: #8f98a0;
+        }
+        
+        .refresh-btn {
+            background: #66c0f4;
+            color: #1b2838;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            margin-top: 10px;
+            transition: all 0.3s ease;
+            width: 100%;
+        }
+        
+        .refresh-btn:hover {
+            background: #8ec5f4;
+            transform: translateY(-2px);
+        }
+        
+        .file-list {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 12px;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .file-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 18px 25px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            transition: background 0.3s ease;
+        }
+        
+        .file-item:last-child {
+            border-bottom: none;
+        }
+        
+        .file-item:hover {
+            background: rgba(102, 192, 244, 0.1);
+        }
+        
+        .file-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .file-icon {
+            width: 45px;
+            height: 45px;
+            background: linear-gradient(135deg, #66c0f4 0%, #4a9ede 100%);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+        
+        .file-details h3 {
+            color: #ffffff;
+            font-size: 16px;
+            margin-bottom: 4px;
+        }
+        
+        .file-details span {
+            color: #8f98a0;
+            font-size: 13px;
+        }
+        
+        .file-actions {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .btn {
+            padding: 10px 18px;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            border: none;
+        }
+        
+        .btn-open {
+            background: rgba(102, 192, 244, 0.2);
+            color: #66c0f4;
+            border: 1px solid #66c0f4;
+        }
+        
+        .btn-open:hover {
+            background: #66c0f4;
+            color: #1b2838;
+        }
+        
+        .btn-download {
+            background: #66c0f4;
+            color: #1b2838;
+        }
+        
+        .btn-download:hover {
+            background: #8ec5f4;
+            transform: translateY(-2px);
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #8f98a0;
+        }
+        
+        .empty-state h3 {
+            font-size: 18px;
+            margin-bottom: 10px;
+            color: #c7d5e0;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #66c0f4;
+        }
+        
+        .status-bar {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 15px 25px;
+            border-radius: 12px;
+            margin-top: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .status-bar span {
+            color: #8f98a0;
+            font-size: 13px;
+        }
+        
+        .status-online {
+            color: #66c0f4;
+        }
+
+        footer {
+            text-align: center;
+            padding: 10px;
+            background-color: #333;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>📁 Qosmio's cracks Files</h1>
+            <p class="folder-info">📂 {{ folder_path }}</p>
+            
+            <div class="search-section">
+                <input type="text" 
+                       id="searchInput" 
+                       class="search-input"
+                       placeholder="🔍 Search files by name...">
+                <button class="refresh-btn" onclick="loadFiles()">
+                    🔄 Refresh
+                </button>
+            </div>
+        </header>
+        
+        <div class="file-list" id="fileList">
+            <div class="loading">Loading files...</div>
+        </div>
+        
+        <div class="status-bar">
+            <span class="status-online">● Server Online</span>
+            <span id="fileCount">Waiting for files...</span>
+        </div>
+    </div>
+    <footer>
+        <p>Creator: Qosmio</p>
+        <p>This webpage is not for public.</p>
+        <p>everything here you see is not made by the webpage creator Qosmio.</p>
+        <p>his cat mad it and posted it on internet. if you want to sue, sue the cat. </p>
+    </footer>
+    
+    <script>
+        let allFiles = []; // Store all files for filtering
+        
+        // Load files when page opens
+        document.addEventListener('DOMContentLoaded', function() {
+            loadFiles();
+            setupSearch();
+        });
+        
+        function setupSearch() {
+            const searchInput = document.getElementById('searchInput');
+            
+            // Real-time search as user types
+            searchInput.addEventListener('input', function() {
+                const searchTerm = this.value.toLowerCase().trim();
+                filterFiles(searchTerm);
+            });
+            
+            // Clear search on Escape key
+            searchInput.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape') {
+                    this.value = '';
+                    filterFiles('');
+                }
+            });
+        }
+        
+        function loadFiles() {
+            const fileList = document.getElementById('fileList');
+            fileList.innerHTML = '<div class="loading">Loading files...</div>';
+            
+            fetch('/api/files')
+                .then(response => response.json())
+                .then(files => {
+                    allFiles = files; // Store for filtering
+                    displayFiles(files);
+                })
+                .catch(error => {
+                    fileList.innerHTML = `
+                        <div class="empty-state">
+                            <h3>❌ Error Loading Files</h3>
+                            <p>${error.message}</p>
+                        </div>
+                    `;
+                });
+        }
+        
+        function filterFiles(searchTerm) {
+            if (!allFiles || allFiles.length === 0) return;
+            
+            const filteredFiles = allFiles.filter(file => 
+                file.name.toLowerCase().includes(searchTerm)
+            );
+            
+            displayFiles(filteredFiles);
+            updateFileCount(filteredFiles.length);
+        }
+        
+        function displayFiles(files) {
+            const fileList = document.getElementById('fileList');
+            
+            if (files.length === 0) {
+                const searchTerm = document.getElementById('searchInput').value.trim();
+                fileList.innerHTML = `
+                    <div class="empty-state">
+                        <h3>📭 No Files Found</h3>
+                        <p>${searchTerm ? 'No files match your search' : 'No .zip files in the manifest folder'}</p>
+                    </div>
+                `;
+                updateFileCount(0);
+                return;
+            }
+            
+            let html = '';
+            files.forEach(file => {
+                html += `
+                    <div class="file-item">
+                        <div class="file-info">
+                            <div class="file-icon">📦</div>
+                            <div class="file-details">
+                                <h3>${file.name}</h3>
+                                <span>${file.size}</span>
+                            </div>
+                        </div>
+                        <div class="file-actions">
+                            <a href="/open/${encodeURIComponent(file.name)}" 
+                               class="btn btn-open" 
+                               target="_blank">
+                                👁️ Open
+                            </a>
+                            <a href="/download/${encodeURIComponent(file.name)}" 
+                               class="btn btn-download"
+                               download>
+                                ⬇️ Download
+                            </a>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            fileList.innerHTML = html;
+            updateFileCount(files.length);
+        }
+        
+        function updateFileCount(count) {
+            const fileCount = document.getElementById('fileCount');
+            const searchTerm = document.getElementById('searchInput').value.trim();
+            
+            if (count === 0) {
+                fileCount.textContent = 'No matches';
+            } else if (searchTerm) {
+                fileCount.textContent = `${count} match${count !== 1 ? 'es' : ''}`;
+            } else {
+                fileCount.textContent = `${count} file${count !== 1 ? 's' : ''}`;
+            }
+        }
+    </script>
+</body>
+</html>
